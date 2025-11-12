@@ -28,4 +28,7 @@ public class User {
 
     @Column(nullable = false, unique = true, length = 20)
     private String email;
+
+    @Column(nullable = false, length = 10)
+    private String role;
 }
