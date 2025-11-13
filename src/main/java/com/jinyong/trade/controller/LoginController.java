@@ -4,11 +4,15 @@ import com.jinyong.trade.dto.LoginDto;
 import com.jinyong.trade.entity.User;
 import com.jinyong.trade.jwt.JwtUtil;
 import com.jinyong.trade.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @RestController
@@ -21,7 +25,7 @@ public class LoginController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
         Optional<User> userOpt = userRepository.findByUserId(loginDto.getUserId());
 
         if (userOpt.isEmpty()) {
@@ -37,7 +41,17 @@ public class LoginController {
         // ✅ JWT 발급
         String token = jwtUtil.createToken(user.getUserId(), user.getRole());
 
-        // ✅ 토큰을 응답으로 전달
-        return ResponseEntity.ok(token);
+        // ✅ JWT를 HttpOnly 쿠키에 담아서 응답
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok("✅ 로그인 성공");
     }
 }
