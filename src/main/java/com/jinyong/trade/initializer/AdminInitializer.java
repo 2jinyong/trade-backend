@@ -19,7 +19,7 @@ public class AdminInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // 관리자 계정이 없으면 생성
-        if (!userRepository.existsByUserId("admin@myapp.com")) {
+        if (!userRepository.existsByUserId("admin")) {
             User admin = new User();
             admin.setUserId("admin");
             admin.setPassword(passwordEncoder.encode("admin1234")); // 반드시 암호화

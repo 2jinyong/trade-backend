@@ -2,6 +2,7 @@ package com.jinyong.trade.controller;
 
 import com.jinyong.trade.dto.LoginDto;
 import com.jinyong.trade.entity.User;
+import com.jinyong.trade.jwt.JwtUtil;
 import com.jinyong.trade.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ public class LoginController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
@@ -32,7 +34,10 @@ public class LoginController {
             return ResponseEntity.status(401).body("❌ 비밀번호가 틀렸습니다.");
         }
 
-        // 로그인 성공 처리 (JWT 발급 예정)
-        return ResponseEntity.ok("✅ 로그인 성공");
+        // ✅ JWT 발급
+        String token = jwtUtil.createToken(user.getUserId(), user.getRole());
+
+        // ✅ 토큰을 응답으로 전달
+        return ResponseEntity.ok(token);
     }
 }
