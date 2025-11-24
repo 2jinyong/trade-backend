@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,17 +17,21 @@ import java.time.Duration;
 public class LogoutController {
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletResponse response) {
-        // ✅ 동일한 이름/경로로 Max-Age=0 쿠키 설정 → 삭제
+    public ResponseEntity<Map<String, String>> logout(HttpServletResponse response) {
         ResponseCookie deleteCookie = ResponseCookie.from("token", "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
+                .sameSite("None")
                 .maxAge(Duration.ZERO)
-                .sameSite("Strict")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
-        return ResponseEntity.ok("✅ 로그아웃 완료");
+
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "로그아웃 완료");
+        return ResponseEntity.ok(result); // ✅ 명확한 JSON 응답
     }
+
+
 }

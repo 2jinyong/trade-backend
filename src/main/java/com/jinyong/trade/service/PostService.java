@@ -1,5 +1,6 @@
 package com.jinyong.trade.service;
 
+import com.jinyong.trade.dto.PostDto;
 import com.jinyong.trade.entity.Post;
 import com.jinyong.trade.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,17 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public Post save(Post post){
+    public Post save(PostDto dto, String username) {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setPrice(dto.getPrice());
+        post.setContent(dto.getContent());
+        post.setUserId(username); // ✅ 로그인 사용자 이름으로 작성자 설정
+
         return postRepository.save(post);
     }
 
-    public List<Post> findAll(){
+    public List<Post> findAll() {
         return postRepository.findAll();
     }
 
@@ -28,6 +35,4 @@ public class PostService {
     public void delete(Long id) {
         postRepository.deleteById(id);
     }
-
-
 }

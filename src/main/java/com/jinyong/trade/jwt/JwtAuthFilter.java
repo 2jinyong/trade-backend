@@ -28,34 +28,42 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // ✅ 쿠키에서 JWT 토큰 꺼내기
+        String path = request.getRequestURI();
+
+        // 🔥 인증 필요 없는 URL은 모두 통과
+        if (path.equals("/api/login") ||
+                path.equals("/api/register") ||
+                path.equals("/api/logout") ||
+                path.equals("/api/auth/check") ||
+                path.startsWith("/h2-console") ||
+                path.startsWith("/uploads/")) {      // ⭐ 이미지 요청은 인증 필터 건너뜀
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ⏬ 기존 JWT 인증 로직
         String token = extractTokenFromCookies(request);
 
-        // ✅ 토큰이 존재하고 유효한 경우
         if (token != null && jwtUtil.validateToken(token)) {
 
-            // ✅ 토큰에서 사용자 이름 꺼냄
             String username = jwtUtil.getUsername(token);
-
-            // ✅ DB에서 사용자 정보 조회
             UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
 
-            // ✅ 인증 객체 생성 (비밀번호는 null, 권한은 userDetails에서 가져옴)
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-            // ✅ 요청 정보(IP, 세션 등)를 인증 객체에 추가
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // ✅ 인증 정보를 SecurityContext에 등록
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        // ✅ 다음 필터 또는 컨트롤러로 요청 넘김
         filterChain.doFilter(request, response);
     }
 
-    // ✅ 쿠키에서 "token" 이름의 JWT 꺼내는 메서드
+    // JWT 추출 함수
     private String extractTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return null;

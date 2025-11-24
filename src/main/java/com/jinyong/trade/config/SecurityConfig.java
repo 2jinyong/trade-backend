@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,11 +33,24 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .headers(h -> h.frameOptions(f -> f.disable())) // H2 콘솔 iframe 허용
                 .authorizeHttpRequests(auth -> auth
-                        // 로그인과 H2 콘솔은 전부 허용
-                        .requestMatchers("api/login","api/register", "/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CORS preflight 허용
+                        .requestMatchers(
+                                "/api/login",
+                                "/api/register",
+                                "/api/logout",
+                                "/api/auth/check",
+                                "/h2-console/**",
+                                "/uploads/**"        // ⭐ 이미지 URL 허용
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/posts/upload").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
+
+
                 .addFilterBefore(
                         new JwtAuthFilter(jwtUtil, customUserDetailService),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class
@@ -46,6 +60,12 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/uploads/**");
+    }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -24,5 +24,4 @@ public class Post {
 
     private int price;       // 가격 (숫자형)
 
-    private String img;      // 이미지 URL
 }

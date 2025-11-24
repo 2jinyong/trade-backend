@@ -40,11 +40,11 @@ public class LoginController {
 
         // ✅ JWT를 HttpOnly 쿠키로 내려줌
         ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(true)           // JS 접근 방지
-                .secure(true)             // HTTPS에서만 전송
-                .path("/")                // 모든 경로에 적용
-                .maxAge(Duration.ofHours(1)) // 1시간 유효
-                .sameSite("Strict")       // CSRF 방지
+                .httpOnly(true)
+                .secure(true)         // ✅ 로컬 개발환경에서는 false
+                .path("/")
+                .sameSite("None")       // ✅ Strict 쓰면 쿠키 안 붙음
+                .maxAge(Duration.ofHours(1))
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
