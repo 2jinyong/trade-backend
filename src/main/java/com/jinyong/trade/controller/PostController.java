@@ -70,6 +70,13 @@ public class PostController {
         return postService.findById(id);
     }
 
+    // 조회수 증가 전용 API
+    @PostMapping("/{id}/views")
+    public ResponseEntity<?> increaseViews(@PathVariable Long id) {
+        postService.increaseViews(id);
+        return ResponseEntity.ok().build();
+    }
+
     // 삭제
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

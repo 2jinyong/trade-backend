@@ -3,6 +3,7 @@ package com.jinyong.trade.service;
 import com.jinyong.trade.dto.PostDto;
 import com.jinyong.trade.entity.Post;
 import com.jinyong.trade.repository.PostRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,4 +36,14 @@ public class PostService {
     public void delete(Long id) {
         postRepository.deleteById(id);
     }
+
+    @Transactional
+    public Post increaseViews(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글 없음"));
+
+        post.setViews(post.getViews() + 1);
+        return post;
+    }
+
 }

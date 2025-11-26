@@ -24,4 +24,8 @@ public class Post {
 
     private int price;       // 가격 (숫자형)
 
+    @Column(nullable = false)
+    private int views = 0;   //조회수
+
+
 }
