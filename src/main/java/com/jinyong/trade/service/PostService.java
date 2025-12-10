@@ -46,4 +46,16 @@ public class PostService {
         return post;
     }
 
+    @Transactional
+    public Post update(Long id, PostDto dto) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글 없음"));
+
+        post.setTitle(dto.getTitle());
+        post.setPrice(dto.getPrice());
+        post.setContent(dto.getContent());
+
+        return post;
+    }
+
 }

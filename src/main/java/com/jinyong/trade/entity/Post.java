@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Post {
+public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가 PK
@@ -26,6 +26,5 @@ public class Post {
 
     @Column(nullable = false)
     private int views = 0;   //조회수
-
 
 }

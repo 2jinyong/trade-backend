@@ -45,9 +45,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/posts/upload").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/posts/*/views").permitAll().anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/posts/*/views").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
+                        .anyRequest().authenticated()
                 )
 
 

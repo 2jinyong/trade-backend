@@ -30,5 +30,16 @@ public class AdminInitializer implements CommandLineRunner {
             userRepository.save(admin);
             System.out.println("✅ 관리자 계정 생성 완료");
         }
+        if (!userRepository.existsByUserId("qwer")) {
+            User qwer = new User();
+            qwer.setUserId("qwer");
+            qwer.setPassword(passwordEncoder.encode("qwer1234")); // 반드시 암호화
+            qwer.setName("qwer");
+            qwer.setTel("1234567890");
+            qwer.setEmail("qwer@qwer");
+            qwer.setRole("USER");
+            userRepository.save(qwer);
+            System.out.println("✅ 테스트 계정 생성 완료");
+        }
     }
 }
