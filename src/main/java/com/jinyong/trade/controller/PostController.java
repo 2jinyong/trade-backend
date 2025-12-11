@@ -21,6 +21,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,8 +87,10 @@ public class PostController {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(cookieName)) {
-                    alreadyViewed = true;
-                    break;
+                    if(cookie.getValue().equals("true")) {
+                        alreadyViewed = true;
+                        break;
+                    }
                 }
             }
         }
@@ -92,8 +99,20 @@ public class PostController {
         if (!alreadyViewed) {
             postService.increaseViews(id);
 
+            // 한국 시간 기준 자정까지 남은 시간 계산 (초 단위)
+            ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+            LocalDateTime now = LocalDateTime.now(koreaZone);
+            LocalDateTime midnight = LocalDateTime.of(LocalDate.now(koreaZone).plusDays(1), LocalTime.MIDNIGHT);
+            long secondsUntilMidnight = ChronoUnit.SECONDS.between(now, midnight);
+
+//            System.out.println("=== 쿠키 만료 시간 디버그 ===");
+//            System.out.println("한국 현재 시간: " + now);
+//            System.out.println("한국 자정: " + midnight);
+//            System.out.println("남은 초: " + secondsUntilMidnight);
+//            System.out.println("남은 시간: " + (secondsUntilMidnight / 3600) + "시간 " + ((secondsUntilMidnight % 3600) / 60) + "분");
+
             Cookie viewCookie = new Cookie(cookieName, "true");
-            viewCookie.setMaxAge(60 * 60 * 24); // 24시간
+            viewCookie.setMaxAge((int) secondsUntilMidnight); // 자정까지 유지
             viewCookie.setPath("/");
             response.addCookie(viewCookie);
         }
