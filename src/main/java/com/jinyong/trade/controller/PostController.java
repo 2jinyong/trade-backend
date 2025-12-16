@@ -1,6 +1,7 @@
 package com.jinyong.trade.controller;
 
 import com.jinyong.trade.dto.PostDto;
+import com.jinyong.trade.dto.PostResponseDto;
 import com.jinyong.trade.entity.Post;
 import com.jinyong.trade.service.PostService;
 import jakarta.servlet.http.Cookie;
@@ -66,10 +67,10 @@ public class PostController {
 
 
 
-    // 전체 조회
+    // 전체 조회 (좋아요 카운트 포함)
     @GetMapping
-    public List<Post> getAll() {
-        return postService.findAll();
+    public List<PostResponseDto> getAll() {
+        return postService.findAllWithLikeCount();
     }
 
     // 단건 조회 + 조회수 자동 증가 (쿠키 기반 중복 방지)

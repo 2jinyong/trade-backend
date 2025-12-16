@@ -25,15 +25,25 @@ public class JwtUtil {
 
     // JWT 생성
     public String createToken(String username, String role) {
+        return createToken(username, role, null);
+    }
+
+    // JWT 생성 (email 포함)
+    public String createToken(String username, String role, String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + 3600000); // 1시간 후
 
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
                 .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(expiryDate);
+
+        if (email != null) {
+            builder.claim("email", email);
+        }
+
+        return builder.signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -76,6 +86,17 @@ public class JwtUtil {
                 .getBody();
 
         return claims.get("role", String.class);
+    }
+
+    // JWT 토큰에서 이메일을 꺼내는 메서드
+    public String getEmail(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("email", String.class);
     }
 
 }

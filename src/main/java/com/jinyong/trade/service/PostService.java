@@ -1,19 +1,23 @@
 package com.jinyong.trade.service;
 
 import com.jinyong.trade.dto.PostDto;
+import com.jinyong.trade.dto.PostResponseDto;
 import com.jinyong.trade.entity.Post;
+import com.jinyong.trade.repository.LikeRepository;
 import com.jinyong.trade.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
 
     public Post save(PostDto dto, String username) {
         Post post = new Post();
@@ -27,6 +31,16 @@ public class PostService {
 
     public List<Post> findAll() {
         return postRepository.findAll();
+    }
+
+    // 좋아요 카운트 포함한 목록 조회
+    public List<PostResponseDto> findAllWithLikeCount() {
+        return postRepository.findAll().stream()
+                .map(post -> {
+                    long likeCount = likeRepository.countByPostId(post.getId());
+                    return PostResponseDto.from(post, likeCount);
+                })
+                .collect(Collectors.toList());
     }
 
     public Post findById(Long id) {

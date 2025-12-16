@@ -25,6 +25,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final CustomUserDetailService customUserDetailService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,11 +39,15 @@ public class SecurityConfig {
                                 "/api/register",
                                 "/api/logout",
                                 "/api/auth/check",
+                                "/api/oauth2/**",
+                                "/oauth2/**",              // Spring OAuth2 Client 경로
+                                "/login/oauth2/code/**",   // OAuth2 콜백 경로
                                 "/h2-console/**",
-                                "/uploads/**"        // ⭐ 이미지 URL 허용
+                                "/uploads/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/likes/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/posts/upload").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/posts/*/views").permitAll()
@@ -52,6 +57,9 @@ public class SecurityConfig {
 
 
 
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
                 .addFilterBefore(
                         new JwtAuthFilter(jwtUtil, customUserDetailService),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class

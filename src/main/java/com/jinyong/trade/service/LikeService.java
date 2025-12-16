@@ -56,4 +56,28 @@ public class LikeService {
         // 7. 결과 반환
         return new LikeDto(liked, likeCount);
     }
+
+    // 좋아요 상태 조회 (로그인 사용자용)
+    public LikeDto getLikeStatus(Long postId, String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        boolean liked = likeRepository.existsByUserAndPost(user, post);
+        long likeCount = likeRepository.countByPost(post);
+
+        return new LikeDto(liked, likeCount);
+    }
+
+    // 좋아요 카운트만 조회 (비로그인 사용자용)
+    public LikeDto getLikeCount(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        long likeCount = likeRepository.countByPost(post);
+
+        return new LikeDto(false, likeCount);
+    }
 }

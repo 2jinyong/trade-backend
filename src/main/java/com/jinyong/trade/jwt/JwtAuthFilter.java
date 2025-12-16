@@ -35,8 +35,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 path.equals("/api/register") ||
                 path.equals("/api/logout") ||
                 path.equals("/api/auth/check") ||
+                path.startsWith("/api/oauth2/") ||
+                path.startsWith("/oauth2/") ||           // Spring OAuth2 Client
+                path.startsWith("/login/oauth2/code/") || // OAuth2 콜백
                 path.startsWith("/h2-console") ||
-                path.startsWith("/uploads/")) {      // ⭐ 이미지 요청은 인증 필터 건너뜀
+                path.startsWith("/uploads/")) {
             filterChain.doFilter(request, response);
             return;
         }

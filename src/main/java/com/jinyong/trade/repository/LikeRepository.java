@@ -17,4 +17,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     // 좋아요 개수 보여줄 때
     long countByPost(Post post);
+
+    // postId로 좋아요 개수 조회
+    long countByPostId(Long postId);
 }

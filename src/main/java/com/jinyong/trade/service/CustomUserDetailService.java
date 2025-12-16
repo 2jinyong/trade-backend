@@ -27,9 +27,12 @@ public class CustomUserDetailService implements UserDetailsService {
 
         // 조회된 사용자 정보를 기반으로 UserDetails 객체 생성
         // Spring Security가 이해할 수 있는 형식으로 감싸줌
+        // 소셜 로그인 사용자는 password가 null이므로 빈 문자열 처리
+        String password = user.getPassword() != null ? user.getPassword() : "";
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUserId(),                  // 사용자 ID
-                user.getPassword(),                  // 비밀번호 (우린 JWT 인증이라 사용 안 함)
+                password,                          // 비밀번호 (JWT 인증이라 실제 사용 안 함)
                 Collections.singletonList(           // 권한 정보
                         new SimpleGrantedAuthority(user.getRole()) // 예: ROLE_USER, ROLE_ADMIN
                 )

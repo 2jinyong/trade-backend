@@ -23,4 +23,18 @@ public class LikeController {
         String userId = userDetails.getUsername();
         return likeService.toggleLike(postId, userId);
     }
+
+    // 좋아요 상태 조회 (로그인 사용자)
+    @GetMapping("/{postId}")
+    public LikeDto getLikeStatus(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            // 비로그인 사용자는 카운트만 반환
+            return likeService.getLikeCount(postId);
+        }
+        String userId = userDetails.getUsername();
+        return likeService.getLikeStatus(postId, userId);
+    }
 }
