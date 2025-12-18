@@ -45,6 +45,18 @@ public class CommentController {
                 .toList();
     }
 
+    // 댓글 수정
+    @PutMapping("/{commentId}")
+    public ResponseEntity<?> update(
+            @PathVariable Long commentId,
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+
+        commentService.update(commentId, body.get("content"), user.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
     // 댓글 삭제
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> delete(

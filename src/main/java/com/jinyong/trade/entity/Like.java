@@ -28,4 +28,11 @@ public class Like {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;  // 어떤 게시글에 좋아요 했는지
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

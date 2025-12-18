@@ -5,6 +5,7 @@ import com.jinyong.trade.entity.Post;
 import com.jinyong.trade.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
@@ -20,4 +21,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     // postId로 좋아요 개수 조회
     long countByPostId(Long postId);
+
+    // 사용자가 좋아요한 게시글 목록 조회
+    List<Like> findByUserOrderByCreatedAtDesc(User user);
 }

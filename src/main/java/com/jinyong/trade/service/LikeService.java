@@ -80,4 +80,15 @@ public class LikeService {
 
         return new LikeDto(false, likeCount);
     }
+
+    // 내가 좋아요한 게시글 목록 조회
+    public java.util.List<Post> getMyLikedPosts(String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        return likeRepository.findByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .map(Like::getPost)
+                .toList();
+    }
 }

@@ -43,7 +43,9 @@ public class SecurityConfig {
                                 "/oauth2/**",              // Spring OAuth2 Client 경로
                                 "/login/oauth2/code/**",   // OAuth2 콜백 경로
                                 "/h2-console/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/ws/**",                  // WebSocket 엔드포인트
+                                "/api/payment/client-key"  // 토스 클라이언트 키 조회
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()

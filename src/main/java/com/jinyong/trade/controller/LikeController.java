@@ -1,11 +1,14 @@
 package com.jinyong.trade.controller;
 
 import com.jinyong.trade.dto.LikeDto;
+import com.jinyong.trade.entity.Post;
 import com.jinyong.trade.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +39,14 @@ public class LikeController {
         }
         String userId = userDetails.getUsername();
         return likeService.getLikeStatus(postId, userId);
+    }
+
+    // 내가 좋아요한 게시글 목록 조회
+    @GetMapping("/my")
+    public List<Post> getMyLikedPosts(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String userId = userDetails.getUsername();
+        return likeService.getMyLikedPosts(userId);
     }
 }

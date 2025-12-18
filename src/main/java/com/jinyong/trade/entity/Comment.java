@@ -15,7 +15,7 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     // 여러 Comment가 하나의 Post에 속함 (N:1 관계)
-    // LAZY: 실제로 필요할 때만 Post 조회 (성능 최적화)
+    // LAZY: 실제로 필요할 때만 Post 조회 (성능 최적화
     @JoinColumn(name = "post_id")
     // comment 테이블에 post_id 컬럼 생성
     private Post post;
@@ -35,6 +35,11 @@ public class Comment extends BaseEntity {
     public Comment(Post post, User user, String content) {
         this.post = post;
         this.user = user;
+        this.content = content;
+    }
+
+    // 댓글 수정
+    public void update(String content) {
         this.content = content;
     }
 }

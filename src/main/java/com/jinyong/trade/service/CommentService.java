@@ -20,14 +20,14 @@ public class CommentService {
     private final UserRepository userRepository;
 
     // 댓글 작성
-    public void create(Long postId, String content, String username) {
+    public void create(Long postId, String content, String userId) {
 
         // 게시글 존재 여부 확인
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시글 없음"));
 
-        // 로그인 사용자 조회
-        User user = userRepository.findByName(username)
+        // 로그인 사용자 조회 (JWT subject에 userId가 저장되어 있음)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
 
         // 댓글 엔티티 생성
@@ -42,15 +42,34 @@ public class CommentService {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
 
-    // 댓글 삭제
-    public void delete(Long commentId, String username) {
+    // 댓글 수정
+    public void update(Long commentId, String content, String userId) {
 
         // 댓글 조회
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글 없음"));
 
-        // 댓글 작성자와 로그인 사용자 비교
-        if (!comment.getUser().getName().equals(username)) {
+        // 댓글 작성자와 로그인 사용자 비교 (userId로 비교)
+        if (!comment.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("본인 댓글만 수정 가능");
+        }
+
+        // 댓글 내용 수정
+        comment.update(content);
+
+        // 변경 감지(Dirty Checking)로 자동 UPDATE
+        commentRepository.save(comment);
+    }
+
+    // 댓글 삭제
+    public void delete(Long commentId, String userId) {
+
+        // 댓글 조회
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글 없음"));
+
+        // 댓글 작성자와 로그인 사용자 비교 (userId로 비교)
+        if (!comment.getUser().getUserId().equals(userId)) {
             throw new RuntimeException("본인 댓글만 삭제 가능");
         }
 
