@@ -33,16 +33,16 @@ public class ChatService {
         User partner = userRepository.findByUserId(partnerUserId)
                 .orElseThrow(() -> new RuntimeException("상대방 없음"));
 
-        // 이미 존재하는 채팅방이 있으면 반환
+        // 내가 나가지 않은 채팅방 중에서 찾기
         return chatRoomRepository.findByUsers(me, partner)
-                .map(room -> {
-                    // 나갔던 사용자가 다시 채팅 시작하면 복귀 처리
+                .filter(room -> {
+                    // 내가 이미 나간 채팅방이면 제외
                     if (room.getSender().equals(me) && room.isSenderLeft()) {
-                        room.setSenderLeft(false);
+                        return false;
                     } else if (room.getReceiver().equals(me) && room.isReceiverLeft()) {
-                        room.setReceiverLeft(false);
+                        return false;
                     }
-                    return room;
+                    return true;
                 })
                 .orElseGet(() -> {
                     // 없으면 새로 생성

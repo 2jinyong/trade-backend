@@ -34,6 +34,9 @@ public class PaymentService {
     @Value("${toss.payments.client-key}")
     private String clientKey;
 
+    @Value("${toss.payments.dev-mode:true}")
+    private boolean devMode;
+
     private static final String TOSS_API_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
     // 결제 준비 (주문 정보 생성)
@@ -55,7 +58,23 @@ public class PaymentService {
     @Transactional
     public Map<String, Object> confirmPayment(String userId, PaymentConfirmDto request) {
         try {
-            // 토스 결제 승인 API 호출
+            // 개발 모드: 실제 토스 API 호출 없이 바로 성공 처리
+            if (devMode) {
+                log.info("개발 모드: 토스 API 호출 건너뛰기 - 바로 충전 처리");
+
+                // 바로 충전 처리
+                walletService.charge(userId, request.getAmount(), request.getPaymentKey(), request.getOrderId());
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("success", true);
+                result.put("message", "충전이 완료되었습니다.");
+                result.put("amount", request.getAmount());
+                result.put("paymentKey", request.getPaymentKey());
+                result.put("orderId", request.getOrderId());
+                return result;
+            }
+
+            // 프로덕션 모드: 실제 토스 결제 승인 API 호출
             WebClient webClient = WebClient.builder()
                     .baseUrl(TOSS_API_URL)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
