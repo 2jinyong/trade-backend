@@ -99,6 +99,8 @@ public class PostController {
             Cookie viewCookie = new Cookie(cookieName, "true");
             viewCookie.setMaxAge((int) secondsUntilMidnight); // 자정까지 유지
             viewCookie.setPath("/");
+            viewCookie.setSecure(true); // HTTPS에서만 전송
+            viewCookie.setAttribute("SameSite", "None"); // 크로스 도메인 허용
             response.addCookie(viewCookie);
         }
 

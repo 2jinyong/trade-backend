@@ -33,9 +33,9 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    // 좋아요 카운트 포함한 목록 조회
+    // 좋아요 카운트 포함한 목록 조회 (최신순 정렬)
     public List<PostResponseDto> findAllWithLikeCount() {
-        return postRepository.findAll().stream()
+        return postRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(post -> {
                     long likeCount = likeRepository.countByPostId(post.getId());
                     return PostResponseDto.from(post, likeCount);
